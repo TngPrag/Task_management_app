@@ -1,0 +1,25 @@
+{
+  "name": "task_management",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "chai": "^5.1.1",
+    "express": "^4.19.2",
+    "express-prometheus-middleware": "^1.2.0",
+    "express-status-monitor": "^1.2.3",
+    "joi": "^17.13.3",
+    "mocha": "^10.6.0",
+    "mock-require": "^3.0.3",
+    "mongodb": "^6.8.0",
+    "sinon": "^18.0.0",
+    "uuid": "^10.0.0"
+  }
+}
