@@ -20,7 +20,7 @@ Task app services
 
 3. Task manager service
       -language: Javascript
-      -webframework: fiber
+      -webframework: express
       -database: mongodb
  * To start the server
     cmd: node main.js
