@@ -103,7 +103,7 @@ func (user *User) Get_user_by_uid() ([]byte, error){
 
         query := goqu.From(table).
                 Select(goqu.Func("row_to_json", table)).
-                Where(goqu.Ex{"id": user.Id, "owner_id": user.Owner_id}).Limit(1)
+                Where(goqu.Ex{"id": user.Id}).Limit(1)
 
         // Generate the SQL command
         get_query, _, _ := query.ToSQL()

@@ -44,6 +44,7 @@ func User_signup(c *fiber.Ctx) error {
 	}
 	// Authenticate the user and check if the user found
 	user_id := c.Locals("user_id").(string)
+	log.Println(user_id)
 	//user_name := c.Locals("user_name").(string)
 	//email := c.Locals("email").(string)
 	token := c.Locals("token").(string)
@@ -51,7 +52,7 @@ func User_signup(c *fiber.Ctx) error {
 	user_req_model.Id = user_id
 	user_data, err := user_req_model.Get_user_by_uid()
 	if user_data == nil && err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error your identitiy is not found": err.Error()})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error data base: user not found": err.Error()})
 	}
 	// check user authorization: 1. check role of the requesting user
 	role, err := pkg.GetUserRole(token)
@@ -174,7 +175,7 @@ func User_read_by_id(c *fiber.Ctx) error {
 	user_model.Owner_id = req_user_id
 	// authorize the user
 	role, _ := pkg.GetUserRole(req_token)
-	status, _ := pkg.VerifyPolicy(req_token, role, "task_app/user_manager_service/api/v0.1/user/read", "GET")
+	status, _ := pkg.VerifyPolicy(req_token, role, "task_app/user_manager_service/api/v0.1/user", "GET")
 	if status {
 		user_data, err := user_model.Get_user_by_uid()
 		if err != nil {
@@ -183,7 +184,7 @@ func User_read_by_id(c *fiber.Ctx) error {
 		if err := json.Unmarshal(user_data, &user_model); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err.Error()})
 		}
-		return c.Status(fiber.StatusOK).JSON(user_data)
+		return c.Status(fiber.StatusOK).JSON(user_model)
 	}
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error": "your identitiy is not found"})
 
@@ -266,7 +267,7 @@ func User_notify(c *fiber.Ctx) error {
 	req_token := c.Locals("token").(string)
 	role, _ := pkg.GetUserRole(req_token)
 	status, _ := pkg.VerifyPolicy(req_token, role, "task_app/task_manager_service/api/v0.1/user", "POST")
-	if status && role == "Admin" {
+	if status && role == "admin" {
 		send_data_model := new(pkg.EmailAdpater)
 		send_data_model.To = userNotifyDto.Email
 		send_data_model.Subject = userNotifyDto.Title

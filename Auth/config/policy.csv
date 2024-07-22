@@ -20,5 +20,7 @@ p, admin, task_app/task_manager_service/api/v0.1/task, GET
 p, admin, task_app/task_manager_service/api/v0.1/task, PUT
 p, user, task_app/task_manager_service/api/v0.1/task, GET
 p, super-admin, task_app/user_manager_service/api/v0.1/user, POST
-g, 30fefc65-c270-4a35-8577-a15b98a8eff4, super-admin
-g, e60480a7-8811-46ae-9a2c-7e6dfd550d7c, admin
+p, admin, task_app/user_manager_service/api/v0.1/user, POST
+g, 8f15a1c5-834f-4245-98e8-c6e19b70df82, super-admin
+g, 926bcc33-270d-46dd-ab5a-1889347af4d4, admin
+g, ac3651ff-e656-45c6-b012-6241b40fddf8, user
