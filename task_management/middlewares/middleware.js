@@ -7,7 +7,7 @@ const axios = require('axios');
  */
 async function authenticate(token) {
   try {
-    const response = await axios.get('http://localhost:8980/task_manager_app/user_manager_service/v0.1/user/verify', {
+    const response = await axios.get('http://localhost:8981/task_app/user_manager_service/api/v0.1/user/verify', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,

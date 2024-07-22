@@ -5,8 +5,8 @@ const axios = require('axios');
  * @param {string} token - The authorization token.
  * @returns {Promise<string>} - A promise that resolves to the user's role.
  */
-async function GetUserRole(token) {
-  const url = 'http://localhost:8980/task_manager_app/auth_service/v0.1/role/read';
+async function getUserRole(token) {
+  const url = 'http://localhost:8980/task_app/authz_service/api/v0.1/role/read';
 
   try {
     const response = await axios.get(url, {
@@ -19,8 +19,8 @@ async function GetUserRole(token) {
     if (response.status !== 200) {
       throw new Error(`Failed to get user role: status code ${response.status}`);
     }
-
-    return response.data.role;
+    //console.log(response.data)
+    return response.data;
   } catch (error) {
     console.error(`Error getting user role: ${error.message}`);
     throw error;
@@ -28,5 +28,5 @@ async function GetUserRole(token) {
 }
 
 module.exports = {
-  GetUserRole,
+  getUserRole,
 };

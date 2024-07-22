@@ -28,7 +28,7 @@ func VerifyPolicy(token, sub, obj, act string) (bool, error) {
 		return false, fmt.Errorf("error marshaling payload: %w", err)
 	}
 
-	req, err := http.NewRequest("GET", url, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if err != nil {
 		return false, fmt.Errorf("error creating request: %w", err)
 	}

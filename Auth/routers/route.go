@@ -15,7 +15,7 @@ func SetupRoutes(app *fiber.App) {
 	policy_routes := app.Group("/task_app/authz_service/api/v0.1/policy/")
 	policy_routes.Post("write", handlers.Policy_write)
 	policy_routes.Get("read/:sub", handlers.Policy_read_by_subject)
-	policy_routes.Get("check_permission", handlers.Policy_check_permission)
+	policy_routes.Post("check_permission", handlers.Policy_check_permission)
 	policy_routes.Delete("remove", handlers.Policy_remove)
 	policy_routes.Get("list", handlers.Policy_list)
 

@@ -1,10 +1,20 @@
-const { taskCreateSchema} = require('../dto/task_create_dto');
-const {taskUpdateStatusSchema, taskUpdateScheduleSchema} = require('../dto/task_update_dto')
-const { TaskModel } = require('../core/task_model');
+const { taskCreateSchema } = require('../dto/task_create_dto');
+const { taskUpdateStatusSchema, taskUpdateScheduleSchema } = require('../dto/task_update_dto');
+const { 
+  createTask, 
+  getTask, 
+  listTasksByUserId, 
+  listTasksByOwnerId, 
+  updateTask, 
+  deleteTask, 
+  deleteTasksByUserId, 
+  deleteTasksByOwnerId 
+} = require('../core/task_model');  // Ensure this path is correct
 const { authenticate } = require('../../middlewares/middleware');
 const { v4: uuidv4 } = require('uuid');
 const { getUserRole } = require('../pkg/authz_proxy_role');
 const { verifyPolicy } = require('../pkg/authz_proxy_policy');
+const { notifyUser } = require('../pkg/user_notify');
 
 /**
  * Create a new task.
@@ -28,11 +38,13 @@ async function Task_write(req, res) {
     const userProfile = await authenticate(token);
 
     const userRole = await getUserRole(token);
+    console.log(userRole)
     if (userRole !== 'admin') {
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
     const hasPolicy = await verifyPolicy(token, userProfile.user_id, 'task_app/task_manager_service/api/v0.1/task', 'POST');
+    
     if (!hasPolicy) {
       return res.status(403).json({ error: 'Forbidden' });
     }
@@ -41,17 +53,18 @@ async function Task_write(req, res) {
 
     const taskData = {
       ...value,
-      user_id: userProfile.user_id,
+      //user_id: userProfile.user_id,
       owner_id: userProfile.user_id,
     };
+    
     // notify the user about the task assignment
     try {
-      await notifyUser(value.email, value.title, value.description, value.deadline, token);
+      await notifyUser(value.user_id,value.title, value.description, value.deadline, token);
     } catch (notifyError) {
       return res.status(500).json({ error: notifyError.message });
-    }s
-    const newTask = new TaskModel(taskData);
-    const createdTask = await TaskModel.createTask(newTask);
+    }
+    //const newTask = new TaskModel(taskData);
+    const createdTask = await createTask(taskData);
     res.status(200).json(createdTask);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -83,7 +96,7 @@ async function Task_read(req, res) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const task = await TaskModel.getTask(req.params.id);
+    const task = await getTask(req.params.id);
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
@@ -124,7 +137,7 @@ async function Task_update_schedule(req, res) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const updatedTask = await TaskModel.updateTask(req.params.id, value);
+    const updatedTask = await updateTask(req.params.id, value);
     if (!updatedTask) {
       return res.status(404).json({ error: 'Task not found' });
     }
@@ -159,7 +172,7 @@ try {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const updatedTask = await TaskModel.updateTask(req.params.id, value);
+    const updatedTask = await updateTask(req.params.id, value);
     if (!updatedTask) {
       return res.status(404).json({ error: 'Task not found' });
     }
@@ -195,7 +208,7 @@ async function Task_delete(req, res) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const deletedTask = await TaskModel.deleteTask(req.params.id);
+    const deletedTask = await deleteTask(req.params.id);
     if (!deletedTask) {
       return res.status(404).json({ error: 'Task not found' });
     }
@@ -231,7 +244,7 @@ async function Task_listByUser(req, res) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const tasks = await TaskModel.listTasksByUserID(userProfile.user_id);
+    const tasks = await listTasksByUserID(userProfile.user_id);
     res.status(200).json(tasks);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -263,7 +276,7 @@ async function Task_listByOwner(req, res) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const tasks = await TaskModel.listTasksByOwnerId(userProfile.user_id);
+    const tasks = await listTasksByOwnerId(userProfile.user_id);
     res.status(200).json(tasks);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -295,7 +308,7 @@ async function Task_deleteByUserId(req, res) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const deletedTasks = await TaskModel.deleteTaskByUserID(req.params.user_id);
+    const deletedTasks = await deleteTaskByUserID(req.params.user_id);
     if (!deletedTasks) {
       return res.status(404).json({ error: 'Tasks not found' });
     }
@@ -331,7 +344,7 @@ async function Task_deleteByOwnerId(req, res) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const deletedTasks = await TaskModel.deleteTaskByOwnerID(req.params.owner_id);
+    const deletedTasks = await deleteTasksByOwnerId(req.params.owner_id);
     if (!deletedTasks) {
       return res.status(404).json({ error: 'Tasks not found' });
     }

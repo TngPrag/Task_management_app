@@ -8,11 +8,11 @@ const axios = require('axios');
  * @param {string} act - The action.
  * @returns {Promise<boolean>} - A promise that resolves to whether the action is allowed.
  */
-async function VerifyPolicy(token, sub, obj, act) {
-  const url = 'http://localhost:8980/task_manager_app/auth_service/v0.1/policy/check_permission';
+async function verifyPolicy(token, sub, obj, act) {
+  const url = 'http://localhost:8980/task_app/authz_service/api/v0.1/policy/check_permission';
 
   const payload = {
-    sub,
+    sub: sub,
     object: obj,
     action: act,
   };
@@ -29,13 +29,13 @@ async function VerifyPolicy(token, sub, obj, act) {
       throw new Error(`Failed to verify policy: status code ${response.status}`);
     }
 
-    return response.data.allowed;
+    return response.data;
   } catch (error) {
-    console.error(`Error verifying policy: ${error.message}`);
+    console.error(`Error verifying policy: ${error}`);
     throw error;
   }
 }
 
 module.exports = {
-  VerifyPolicy,
+  verifyPolicy,
 };

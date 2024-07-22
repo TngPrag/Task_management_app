@@ -1,16 +1,16 @@
 const axios = require('axios');
 
-async function notifyUser(email, title, description, deadline, authToken) {
-  const url = 'http://localhost:3000/task_app/user_manager_service/api/v0.1/user/notify'; // Replace with your actual URL
+async function notifyUser(user_id, title, description, deadline, authToken) {
+  const url = 'http://localhost:8981/task_app/user_manager_service/api/v0.1/user/notify'; // Updated port
   const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${authToken}`
   };
   const body = {
-    email,
-    title,
-    description,
-    deadline
+    "user_id":user_id,
+    "title": title,
+    "description": description,
+    "deadline": deadline
   };
 
   try {
@@ -21,10 +21,11 @@ async function notifyUser(email, title, description, deadline, authToken) {
       throw new Error(`Failed to notify user: ${response.data}`);
     }
   } catch (error) {
+    console.error('Error response data:', error.response.data);
     throw new Error(`Error notifying user: ${error.message}`);
   }
 }
 
 module.exports = {
-    notifyUser,
-  };
+  notifyUser,
+};

@@ -262,22 +262,34 @@ func User_notify(c *fiber.Ctx) error {
 	}
 
 	if err := userNotifyDto.ValidateUserNotifyDto(); err != nil {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"error": "Invalid input", "details": err.Error()})
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"Invalid input ": err.Error()})
 	}
 	req_token := c.Locals("token").(string)
 	role, _ := pkg.GetUserRole(req_token)
-	status, _ := pkg.VerifyPolicy(req_token, role, "task_app/task_manager_service/api/v0.1/user", "POST")
-	if status && role == "admin" {
-		send_data_model := new(pkg.EmailAdpater)
-		send_data_model.To = userNotifyDto.Email
-		send_data_model.Subject = userNotifyDto.Title
-		send_data_model.Body = userNotifyDto.Description + " And the deadline is " + userNotifyDto.Deadline
-		err := send_data_model.SendMessageViaEmail()
-		if err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"Unable to send user email notification": err.Error()})
-		}
+	status, _ := pkg.VerifyPolicy(req_token, role, "task_app/user_manager_service/api/v0.1/user", "POST")
+	if status {
+		if role == "admin" {
+			// get task user email
+			user_data_model := new(core.User)
+			user_data_model.Id = userNotifyDto.User_id
+			user_data, err2 := user_data_model.Get_user_by_uid()
+			if err2 != nil {
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"Error, asigned user not found": err2.Error()})
+			}
+			if json.Unmarshal(user_data,&user_data_model); err2!= nil{
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error":err2})
+			}
+			send_data_model := new(pkg.EmailAdpater)
+			send_data_model.To = user_data_model.Email
+			send_data_model.Subject = userNotifyDto.Title
+			send_data_model.Body = userNotifyDto.Description + " And the deadline is " + userNotifyDto.Deadline
+			err := send_data_model.SendMessageViaEmail()
+			if err != nil {
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"Unable to send user email notification": err.Error()})
+			}
 
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "User notified successfully via email"})
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "User notified successfully via email"})
+		}
 	}
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error": "your identitiy is not found"})
 
