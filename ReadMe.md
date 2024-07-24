@@ -6,7 +6,7 @@ Task app services
     -database: postgresql
 
  * To start the server
-   cmd:    go run test_api.go
+   cmd:    go run main.go
  * To monitor the server
    http://localhost:8980/task_app/authz_service/api/v0.1/health
  * To view swagger docs
@@ -16,7 +16,7 @@ Task app services
      -webframework: fiber
      -database: postgresql
  * TO start the server
-    cmd: go run test_api.go
+    cmd: go run main.go
  * To monitor the server
    http://localhost:8981/task_app/user_manager_service/api/v0.1/health
  * To view swagger docs
