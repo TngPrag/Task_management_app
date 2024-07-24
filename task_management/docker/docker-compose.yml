@@ -1,0 +1,27 @@
+services:
+  task-mongodb:
+    image: mongo:latest
+    container_name: task-mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - task-app-network
+
+  task-manager-service:
+    build:
+      context: .  # Path to your Dockerfile directory (adjust if needed)
+      dockerfile: docker/Dockerfile  # Adjust if your Dockerfile is located in a subdirectory
+    image: task-manager-service
+    container_name: task-manager-service
+    ports:
+      - "3000:3000"
+    depends_on:
+      - task-mongodb
+    networks:
+      - task-app-network
+    environment:
+      - MONGO_URI=mongodb://task-mongodb:27017/TaskApp
+
+networks:
+  task-app-network:
+    driver: bridge
