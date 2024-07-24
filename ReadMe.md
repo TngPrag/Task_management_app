@@ -9,6 +9,8 @@ Task app services
    cmd:    go run test_api.go
  * To monitor the server
    http://localhost:8980/task_app/authz_service/api/v0.1/health
+ * To view swagger docs
+   http://localhost:8980/swagger
 2. User manager service
      -language: Go
      -webframework: fiber
