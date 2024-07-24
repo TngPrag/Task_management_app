@@ -19,7 +19,8 @@ Task app services
     cmd: go run test_api.go
  * To monitor the server
    http://localhost:8981/task_app/user_manager_service/api/v0.1/health
-
+ * To view swagger docs
+   http://localhost:8981/swagger
 3. Task manager service
       -language: Javascript
       -webframework: express
@@ -28,4 +29,7 @@ Task app services
     cmd: node main.js
 * To monitor the server
     http://localhost:3000/status
+* To view swagger docs
+  http://localhost:3000/swagger
+
 
