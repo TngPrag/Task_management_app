@@ -13,7 +13,7 @@ import (
 	"tele_auth/routers"
 
 	//	event_processor "user_manager/logic/event_processor"
-
+	_ "tele_auth/docs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"

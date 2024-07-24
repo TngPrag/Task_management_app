@@ -1,0 +1,312 @@
+basePath: /task_app/authz_service/api/v0.1
+definitions:
+  core.Policy:
+    properties:
+      act:
+        type: string
+      obj:
+        type: string
+      sub:
+        type: string
+    type: object
+  core.Role:
+    properties:
+      role:
+        type: string
+      user:
+        type: string
+    type: object
+  dto.CheckPolicyPermissionDto:
+    properties:
+      action:
+        type: string
+      object:
+        type: string
+      sub:
+        type: string
+    type: object
+  dto.CreatePolicyDto:
+    properties:
+      action:
+        type: string
+      object:
+        type: string
+      sub:
+        type: string
+    type: object
+  dto.CreateRoleDto:
+    properties:
+      role:
+        type: string
+      user_id:
+        type: string
+    required:
+    - role
+    - user_id
+    type: object
+  dto.RemovePolicyDto:
+    properties:
+      action:
+        type: string
+      object:
+        type: string
+      sub:
+        type: string
+    type: object
+host: localhost:8980
+info:
+  contact:
+    email: tng.nat2023@gmail.com
+    name: Tsegay Negassi
+  description: This is used to do RBAC authorization policy
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Task Authorization Service
+  version: "0.1"
+paths:
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Returns the health status of the authorization service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check for the authorization service
+      tags:
+      - Health
+  /policy/check_permission:
+    post:
+      consumes:
+      - application/json
+      description: Check if a subject has a specific permission
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Permission check request
+        in: body
+        name: check
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CheckPolicyPermissionDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.Policy'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Check permission
+      tags:
+      - Policy
+  /policy/list:
+    get:
+      consumes:
+      - application/json
+      description: List all RBAC policies
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/core.Policy'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: List all policies
+      tags:
+      - Policy
+  /policy/remove:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an existing RBAC policy
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Policy to be removed
+        in: body
+        name: policy
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RemovePolicyDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove a policy
+      tags:
+      - Policy
+  /policy/write:
+    post:
+      consumes:
+      - application/json
+      description: Create a new RBAC policy
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Policy to be created
+        in: body
+        name: policy
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreatePolicyDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.Policy'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new policy
+      tags:
+      - Policy
+  /role/read:
+    get:
+      consumes:
+      - application/json
+      description: Get all roles in the system
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/core.Role'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get all roles
+      tags:
+      - Role
+  /role/write:
+    post:
+      consumes:
+      - application/json
+      description: Create a new role for RBAC
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Role to be created
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateRoleDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.Role'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new role
+      tags:
+      - Role
+  /task_app/authz_service/api/v0.1/policy/read/{sub}:
+    get:
+      consumes:
+      - application/json
+      description: Get RBAC policy by subject
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Subject
+        in: path
+        name: sub
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.Policy'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get policy by subject
+      tags:
+      - Policy
+swagger: "2.0"

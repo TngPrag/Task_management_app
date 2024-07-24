@@ -10,6 +10,19 @@ import (
 )
 
 // super-admin
+
+// PolicyWrite godoc
+// @Summary Create a new policy
+// @Description Create a new RBAC policy
+// @Tags Policy
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param policy body dto.CreatePolicyDto true "Policy to be created"
+// @Success 200 {object} core.Policy
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /policy/write [post]
 func Policy_write(c *fiber.Ctx) error {
 	policy_write_dto := new(dto.CreatePolicyDto)
 	if err := c.BodyParser(policy_write_dto); err != nil {
@@ -46,6 +59,19 @@ func Policy_write(c *fiber.Ctx) error {
 }
 
 // super-admin/
+
+// PolicyReadBySubject godoc
+// @Summary Get policy by subject
+// @Description Get RBAC policy by subject
+// @Tags Policy
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param sub path string true "Subject"
+// @Success 200 {object} core.Policy
+// @Failure 404 {object} map[string]string
+// @Security BearerAuth
+// @Router /task_app/authz_service/api/v0.1/policy/read/{sub} [get]
 func Policy_read_by_subject(c *fiber.Ctx) error {
 	subject := c.Params("sub")
 	// authenticate the user
@@ -78,6 +104,18 @@ func Policy_read_by_subject(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "user has no permission"})
 }
 
+// PolicyRemove godoc
+// @Summary Remove a policy
+// @Description Remove an existing RBAC policy
+// @Tags Policy
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param policy body dto.RemovePolicyDto true "Policy to be removed"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /policy/remove [delete]
 func Policy_remove(c *fiber.Ctx) error {
 	rem_policy_dto := new(dto.RemovePolicyDto)
 	if err := c.BodyParser(rem_policy_dto); err != nil {
@@ -112,6 +150,18 @@ func Policy_remove(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"User Unauthorized!": err})
 }
 
+// PolicyCheckPermission godoc
+// @Summary Check permission
+// @Description Check if a subject has a specific permission
+// @Tags Policy
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param check body dto.CheckPolicyPermissionDto true "Permission check request"
+// @Success 200 {object} core.Policy
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /policy/check_permission [post]
 func Policy_check_permission(c *fiber.Ctx) error {
 	check_pol_perm_dto := new(dto.CheckPolicyPermissionDto)
 	if err := c.BodyParser(check_pol_perm_dto); err != nil {
@@ -135,7 +185,7 @@ func Policy_check_permission(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"User Unauthorized!": err.Error()})
 	}
-	
+
 	check_permission, _ := enforceWrapper.CheckPermission(user_role, "task_app/authz_service/api/v0.1/policy", "Verify")
 	if check_permission {
 		//policy := core.Policy{Sub: check_pol_perm_dto.Subject, Obj: check_pol_perm_dto.Object, Act: check_pol_perm_dto.Action}
@@ -147,6 +197,17 @@ func Policy_check_permission(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"User Unauthorized!": err})
 }
+
+// PolicyList godoc
+// @Summary List all policies
+// @Description List all RBAC policies
+// @Tags Policy
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {array} core.Policy
+// @Security BearerAuth
+// @Router /policy/list [get]
 func Policy_list(c *fiber.Ctx) error {
 	// authenticate the user
 	authHeader := c.Get("Authorization")

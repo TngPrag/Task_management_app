@@ -9,6 +9,19 @@ import (
 )
 
 // should be allowed to super-admin/admin
+
+// RoleWrite godoc
+// @Summary Create a new role
+// @Description Create a new role for RBAC
+// @Tags Role
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param role body dto.CreateRoleDto true "Role to be created"
+// @Success 200 {object} core.Role
+// @Failure 400 {object} map[string]string
+// @Security BearerAuth
+// @Router /role/write [post]
 func Role_write(c *fiber.Ctx) error {
 	role_write_dto := new(dto.CreateRoleDto)
 	if err := c.BodyParser(role_write_dto); err != nil {
@@ -55,12 +68,23 @@ func Role_write(c *fiber.Ctx) error {
 				return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"admin has no previlage to assign a role to other that user": err})
 			}
 		}
-		
+
 	}
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"User Unauthorized!": err})
 }
 
 // should be allowed to super-admin/admin/user
+
+// RoleRead godoc
+// @Summary Get all roles
+// @Description Get all roles in the system
+// @Tags Role
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {array} core.Role
+// @Security BearerAuth
+// @Router /role/read [get]
 func Role_read(c *fiber.Ctx) error {
 	//user_id := c.Params("user_id")
 	// authenticate the user
@@ -78,7 +102,7 @@ func Role_read(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"User Unauthorized!": err.Error()})
 	}
-	
+
 	check_permission, _ := enforceWrapper.CheckPermission(user_role, "task_app/authz_service/api/v0.1/role", "GET")
 	if check_permission {
 		user_role, err := enforceWrapper.GetRole(uid)
