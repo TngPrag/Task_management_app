@@ -30,6 +30,6 @@ Task app services
 * To monitor the server
     http://localhost:3000/status
 * To view swagger docs
-  http://localhost:3000/swagger
+  http://localhost:3000/api-docs
 
 
