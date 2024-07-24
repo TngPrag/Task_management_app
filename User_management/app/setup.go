@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	//_ "user_manager/docs"
+	_ "user_manager/docs"
 	"user_manager/fs"
 	"user_manager/logic/core"
 	"user_manager/routers"

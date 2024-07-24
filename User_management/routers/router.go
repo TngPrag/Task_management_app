@@ -22,7 +22,7 @@ func SetupRoutes(app *fiber.App) {
 	user_group_routes.Post("notify", handlers.User_notify)
 	user_group_routes.Get("read/:user_id",handlers.User_read_by_id)
 	user_group_routes.Delete("remove/:user_id",handlers.User_remove_by_id)
-	user_group_routes.Delete("remove",handlers.User_remove_by_owner_id)
+	user_group_routes.Delete("remove_all",handlers.User_remove_by_owner_id)
 	user_group_routes.Get("read_all",handlers.User_list_by_owner_id)
 
 }

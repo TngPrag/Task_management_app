@@ -13,6 +13,18 @@ import (
 	"github.com/google/uuid"
 )
 
+// User_authenticate godoc
+// @Summary Verify a user
+// @Description Login with username and password
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} responses.UserAuthProfileDto
+// @Failure 400 {object} map[string]string
+// @Failure 422 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /user/verify [get]
 func User_authenticate(c *fiber.Ctx) error {
 	user_verified_profile := new(core.User)
 	user_verified_profile.Id = c.Locals("user_id").(string)
@@ -34,6 +46,19 @@ func User_authenticate(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(user_verified_resp)
 }
 
+// User_signup godoc
+// @Summary Sign up a new user
+// @Description Create a new user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param user body requests.CreateUserDto true "Create User"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 422 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/write [post]
 func User_signup(c *fiber.Ctx) error {
 	user_dto := new(requests.CreateUserDto)
 	if err := c.BodyParser(user_dto); err != nil {
@@ -114,6 +139,19 @@ func User_signup(c *fiber.Ctx) error {
 
 }
 
+// User_login godoc
+// @Summary Login a user
+// @Description Login with username and password
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param user body requests.LoginDto true "Login User"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 422 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /user/login [post]
 func User_login(c *fiber.Ctx) error {
 	// Parse the request body into a login DTO
 	userLoginDto := new(requests.LoginDto)
@@ -165,6 +203,18 @@ func User_login(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": token})
 }
 
+// User_read_by_id godoc
+// @Summary Get user by ID
+// @Description Get user details by user ID
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param user_id path string true "User ID"
+// @Success 200 {object} core.User
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/read/{user_id} [get]
 func User_read_by_id(c *fiber.Ctx) error {
 
 	uid := c.Params("user_id")
@@ -190,6 +240,19 @@ func User_read_by_id(c *fiber.Ctx) error {
 
 }
 
+// User_remove_by_id godoc
+// @Summary Remove a user by ID
+// @Description Remove a user from the system by their ID
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param user_id path string true "User ID"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /user/remove/{user_id} [delete]
 func User_remove_by_id(c *fiber.Ctx) error {
 	uid := c.Params("user_id")
 	user_model := new(core.User)
@@ -212,6 +275,19 @@ func User_remove_by_id(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error": "your identitiy is not found"})
 
 }
+
+// User_remove_by_owner_id godoc
+// @Summary Remove users by owner ID
+// @Description Remove users where the owner's ID matches the authenticated user's ID
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /user/remove_all [delete]
 func User_remove_by_owner_id(c *fiber.Ctx) error {
 	user_model := new(core.User)
 	req_user_id := c.Locals("user_id").(string)
@@ -231,6 +307,19 @@ func User_remove_by_owner_id(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error": "your identitiy is not found"})
 
 }
+
+// User_list_by_owner_id godoc
+// @Summary List users by owner ID
+// @Description Retrieve a list of users where the owner's ID matches the authenticated user's ID
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {array} core.User
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /user/read_all [get]
 func User_list_by_owner_id(c *fiber.Ctx) error {
 	user_model := new(core.User)
 	req_user_id := c.Locals("user_id").(string)
@@ -255,6 +344,20 @@ func User_list_by_owner_id(c *fiber.Ctx) error {
 
 }
 
+// User_notify godoc
+// @Summary Notify a user via email
+// @Description Send an email notification to a user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param notification body requests.UserNotifyDto true "User Notification"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 422 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /user/notify [post]
 func User_notify(c *fiber.Ctx) error {
 	userNotifyDto := new(requests.UserNotifyDto)
 	if err := c.BodyParser(userNotifyDto); err != nil {
@@ -276,8 +379,8 @@ func User_notify(c *fiber.Ctx) error {
 			if err2 != nil {
 				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"Error, asigned user not found": err2.Error()})
 			}
-			if json.Unmarshal(user_data,&user_data_model); err2!= nil{
-				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error":err2})
+			if err2 := json.Unmarshal(user_data, &user_data_model); err2 != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err2})
 			}
 			send_data_model := new(pkg.EmailAdpater)
 			send_data_model.To = user_data_model.Email

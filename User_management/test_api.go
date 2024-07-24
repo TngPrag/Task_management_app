@@ -4,7 +4,7 @@ import (
 	"user_manager/app"
 )
 
-func main() {
+func dmain() {
 
 	// setup and run app fiber app
 	err := app.SetupANDRun()
