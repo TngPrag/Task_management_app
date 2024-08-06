@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -43,7 +42,7 @@ func GetUserRole(token string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error unmarshaling response body: %w", err)
 	}
-	log.Println(role)
+	//log.Println(role)
 	return role, nil
 }
 

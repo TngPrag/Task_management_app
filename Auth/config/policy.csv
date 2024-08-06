@@ -10,6 +10,9 @@ p, super-admin, task_app/authz_service/api/v0.1/role, GET
 p, admin, task_app/authz_service/api/v0.1/policy, Verify
 p, user, task_app/authz_service/api/v0.1/policy, Verify
 p, super-admin, task_app/user_manager_service/api/v0.1/user, GET
+p, super-admin, task_app/user_manager_service/api/v0.1/user, PUT
+p, admin, task_app/user_manager_service/api/v0.1/user, PUT
+p, user, task_app/user_manager_service/api/v0.1/user, PUT
 p, admin, task_app/user_manager_service/api/v0.1/user, GET
 p, user, task_app/user_manager_service/api/v0.1/user, GET
 p, admin, task_app/user_manager_service/api/v0.1/user, DELETE
@@ -21,6 +24,7 @@ p, admin, task_app/task_manager_service/api/v0.1/task, PUT
 p, user, task_app/task_manager_service/api/v0.1/task, GET
 p, super-admin, task_app/user_manager_service/api/v0.1/user, POST
 p, admin, task_app/user_manager_service/api/v0.1/user, POST
-g, 8e696fab-a0f2-486d-b04f-848768ed3809, super-admin
-g, b09d8b25-468e-44a1-a99e-a0893228ff7a, admin
-g, 8be3ba0e-72dc-449f-84b8-b3ff8b11440d, user
+g, 3b27fd36-67ac-4542-afe8-34f6e246c85c, super-admin
+g, 0efc3fae-f8be-4fe2-bd6e-ee7b7220fe67, admin
+g, 4157f7e3-60cc-4650-a7e4-4203677293d5, admin
+g, ffcedc8b-d51a-47af-a502-307d278aa6e1, user

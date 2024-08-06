@@ -1,6 +1,3 @@
-task-1: documentation
-task-2: email reporting
-task-3: 
 Task Manager Service 
 ====================
 domain entity

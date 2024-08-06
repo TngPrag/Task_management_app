@@ -2,6 +2,7 @@ package db_driver
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -174,16 +175,33 @@ func (tscdb *Timescaledb_conn) Timescale_remove_data(query_data string) error {
 }
 
 func (tscdb *Timescaledb_conn) Timescale_list_data(query_data string) ([]byte, error) {
-	//rows, err := tscdb.Tdb.Query(context.Background(),query_data)
-	var jsonData []byte
-
-	err := tscdb.Tdb.QueryRow(context.Background(), query_data).Scan(&jsonData)
+	rows, err := tscdb.Tdb.Query(context.Background(), query_data)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %w", err)
 	}
-	//fmt.Println(string(jsonData))
+	defer rows.Close()
+
+	var results []json.RawMessage
+
+	for rows.Next() {
+		var jsonData json.RawMessage
+		err := rows.Scan(&jsonData)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %w", err)
+		}
+		results = append(results, jsonData)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over rows: %w", err)
+	}
+
+	jsonData, err := json.Marshal(results)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling results to JSON: %w", err)
+	}
+
 	return jsonData, nil
-	//return rows,nil
 }
 
 func kmain() {

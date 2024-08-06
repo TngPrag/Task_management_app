@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"user_manager/db_driver"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -42,16 +43,16 @@ func (rel_table *Db_client_object) Fs_driver_create_relational_table(query_creat
 	return nil
 }
 
-func (hyper_table *Db_client_object) Fs_driver_create_hyper_table(queryCreateTable string, queryCreateHypertable string) error{
+func (hyper_table *Db_client_object) Fs_driver_create_hyper_table(queryCreateTable string, queryCreateHypertable string) error {
 	/*
-	queryCreateTable := `CREATE TABLE Telemetry_data (
-		time TIMESTAMPTZ NOT NULL,
-		thing_id string,
-		tempera DOUBLE PRECISION,
-		cpu DOUBLE PRECISION,
-		FOREIGN KEY (sensor_id) REFERENCES sensors (id));
-		`
-	queryCreateHypertable := `SELECT create_hypertable('vehicle_data', 'time');`
+		queryCreateTable := `CREATE TABLE Telemetry_data (
+			time TIMESTAMPTZ NOT NULL,
+			thing_id string,
+			tempera DOUBLE PRECISION,
+			cpu DOUBLE PRECISION,
+			FOREIGN KEY (sensor_id) REFERENCES sensors (id));
+			`
+		queryCreateHypertable := `SELECT create_hypertable('vehicle_data', 'time');`
 	*/
 
 	//db_driver.Timescaledb_conn.Timescale_create_ts_table()
@@ -88,7 +89,7 @@ func (hyper_table *Db_client_object) Fs_driver_write(query string) error {
 
 }
 func (hyper_table *Db_client_object) Fs_driver_write_batch() error {
-	query := fmt.Sprintf("INSERT INTO %s %f (owner_id, thing_id, thin) VALUES ($1, $2);", "Dot_channel", 45.6)
+	query := fmt.Sprintf("INSERT INTO %s %f (owner_id, thing_id) VALUES ($1, $2);", "Dot_channel", 45.6)
 	fmt.Println(query)
 	err := hyper_table.Timescale_write_many_data([]string{"1"})
 	if err != nil {
@@ -99,13 +100,13 @@ func (hyper_table *Db_client_object) Fs_driver_write_batch() error {
 	return nil
 }
 
-func (hyper_table *Db_client_object) Fs_driver_read(q string) ([]byte, error){
+func (hyper_table *Db_client_object) Fs_driver_read(q string) ([]byte, error) {
 	//q := `SELECT * FROM Dot_channel WHERE thing_id ='a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';`
 	//fmt.Println(q)
 	//var data_model Dot_channel_model
 
 	data, err := hyper_table.Timescale_read_data(q)
-	if err!= nil{
+	if err != nil {
 		return nil, err
 	}
 	return data, nil
@@ -136,7 +137,7 @@ func (hyper_table *Db_client_object) Fs_driver_read(q string) ([]byte, error){
 	*/
 
 }
-func (hyper_table *Db_client_object) Fs_driver_update(query string) error{
+func (hyper_table *Db_client_object) Fs_driver_update(query string) error {
 	err := hyper_table.Timescale_update_data(query)
 	if err != nil {
 		log.Println(err)
@@ -145,7 +146,7 @@ func (hyper_table *Db_client_object) Fs_driver_update(query string) error{
 	fmt.Println("updated successfully")
 	return nil
 }
-func (hyper_table *Db_client_object) Fs_driver_delete(query string) error{
+func (hyper_table *Db_client_object) Fs_driver_delete(query string) error {
 	//query := `DELETE FROM Dot_channel WHERE thing_id='a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'`
 	err := hyper_table.Timescale_remove_data(query)
 	if err != nil {
@@ -156,13 +157,14 @@ func (hyper_table *Db_client_object) Fs_driver_delete(query string) error{
 	return nil
 
 }
-func (hyper_table *Db_client_object) Fs_driver_list(query string) ([]byte,error){
+func (hyper_table *Db_client_object) Fs_driver_list(query string) ([]byte, error) {
 	//query := "SELECT json_agg(row_to_json(Dot_channel)) FROM Dot_channel"
-	data,err := hyper_table.Timescale_list_data(query)
-	if err!= nil{
+	data, err := hyper_table.Timescale_list_data(query)
+	if err != nil {
 		//log.Println(err)
-		return nil,err
+		return nil, err
 	}
+	//log.Println(string(data))
 	return data, nil
 	/*
 		var result []Dot_channel_model

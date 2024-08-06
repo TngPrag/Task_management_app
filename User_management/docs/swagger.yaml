@@ -3,7 +3,6 @@ definitions:
   core.User:
     properties:
       created_at:
-        description: Role      string    `json:"role"`
         type: string
       email:
         type: string
@@ -14,6 +13,8 @@ definitions:
       owner_id:
         type: string
       password:
+        type: string
+      role:
         type: string
       updated_at:
         type: string
@@ -50,6 +51,16 @@ definitions:
         type: string
     required:
     - email
+    - user_name
+    type: object
+  requests.UserCredentialUpdateDto:
+    properties:
+      password:
+        type: string
+      user_name:
+        type: string
+    required:
+    - password
     - user_name
     type: object
   requests.UserNotifyDto:
@@ -209,6 +220,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Notify a user via email
       tags:
       - user
@@ -247,6 +260,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get user by ID
       tags:
       - user
@@ -289,6 +304,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List users by owner ID
       tags:
       - user
@@ -335,6 +352,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Remove a user by ID
       tags:
       - user
@@ -377,7 +396,64 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Remove users by owner ID
+      tags:
+      - user
+  /user/update:
+    put:
+      consumes:
+      - application/json
+      description: Update the username and password of a user
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User Credential Update DTO
+        in: body
+        name: userCredentialUpdateDto
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UserCredentialUpdateDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user credentials (username and password)
       tags:
       - user
   /user/verify:
@@ -416,6 +492,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Verify a user
       tags:
       - user
@@ -463,6 +541,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Sign up a new user
       tags:
       - user

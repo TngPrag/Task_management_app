@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -52,12 +51,12 @@ func VerifyPolicy(token, sub, obj, act string) (bool, error) {
 	}
 
 	var status bool
-	log.Println("status1:", string(body))
+	//log.Println("status1:", string(body))
 	err = json.Unmarshal(body, &status)
 	if err != nil {
 		return false, fmt.Errorf("error unmarshaling response body: %w", err)
 	}
-	log.Println("status:", status)
+	//log.Println("status:", status)
 	// var response struct {
 	// 	Allowed bool `json:"allowed"`
 	// }

@@ -1,8 +1,3 @@
-Initialization proceudure
--> init postgresql database
--> init create super-admin user on this service and define its role on auth service.
-->
-
 User management Service
 =======================
 Key functionality

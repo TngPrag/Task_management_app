@@ -119,6 +119,11 @@ const docTemplate = `{
         },
         "/user/notify": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Send an email notification to a user",
                 "consumes": [
                     "application/json"
@@ -199,6 +204,11 @@ const docTemplate = `{
         },
         "/user/read/{user_id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get user details by user ID",
                 "consumes": [
                     "application/json"
@@ -256,6 +266,11 @@ const docTemplate = `{
         },
         "/user/read_all": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of users where the owner's ID matches the authenticated user's ID",
                 "consumes": [
                     "application/json"
@@ -318,6 +333,11 @@ const docTemplate = `{
         },
         "/user/remove/{user_id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Remove a user from the system by their ID",
                 "consumes": [
                     "application/json"
@@ -387,6 +407,11 @@ const docTemplate = `{
         },
         "/user/remove_all": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Remove users where the owner's ID matches the authenticated user's ID",
                 "consumes": [
                     "application/json"
@@ -447,8 +472,98 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/update": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the username and password of a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update user credentials (username and password)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User Credential Update DTO",
+                        "name": "userCredentialUpdateDto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UserCredentialUpdateDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/verify": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Login with username and password",
                 "consumes": [
                     "application/json"
@@ -508,6 +623,11 @@ const docTemplate = `{
         },
         "/user/write": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new user",
                 "consumes": [
                     "application/json"
@@ -583,7 +703,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
-                    "description": "Role      string    ` + "`" + `json:\"role\"` + "`" + `",
                     "type": "string"
                 },
                 "email": {
@@ -599,6 +718,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "role": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -647,6 +769,21 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "password": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.UserCredentialUpdateDto": {
+            "type": "object",
+            "required": [
+                "password",
+                "user_name"
+            ],
+            "properties": {
                 "password": {
                     "type": "string"
                 },

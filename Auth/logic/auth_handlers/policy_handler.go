@@ -71,7 +71,7 @@ func Policy_write(c *fiber.Ctx) error {
 // @Success 200 {object} core.Policy
 // @Failure 404 {object} map[string]string
 // @Security BearerAuth
-// @Router /task_app/authz_service/api/v0.1/policy/read/{sub} [get]
+// @Router /policy/read/{sub} [get]
 func Policy_read_by_subject(c *fiber.Ctx) error {
 	subject := c.Params("sub")
 	// authenticate the user

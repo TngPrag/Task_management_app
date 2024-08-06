@@ -2,7 +2,6 @@ package userhandlers
 
 import (
 	"encoding/json"
-	"log"
 	"time"
 	"user_manager/logic/core"
 	"user_manager/logic/dto/requests"
@@ -24,6 +23,7 @@ import (
 // @Failure 400 {object} map[string]string
 // @Failure 422 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/verify [get]
 func User_authenticate(c *fiber.Ctx) error {
 	user_verified_profile := new(core.User)
@@ -58,6 +58,7 @@ func User_authenticate(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]string
 // @Failure 422 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/write [post]
 func User_signup(c *fiber.Ctx) error {
 	user_dto := new(requests.CreateUserDto)
@@ -69,7 +70,7 @@ func User_signup(c *fiber.Ctx) error {
 	}
 	// Authenticate the user and check if the user found
 	user_id := c.Locals("user_id").(string)
-	log.Println(user_id)
+	//log.Println(user_id)
 	//user_name := c.Locals("user_name").(string)
 	//email := c.Locals("email").(string)
 	token := c.Locals("token").(string)
@@ -87,11 +88,11 @@ func User_signup(c *fiber.Ctx) error {
 
 	// check if this request making user can access this api
 	status, _ := pkg.VerifyPolicy(token, role, "task_app/user_manager_service/api/v0.1/user", "POST")
-	log.Println(status)
+	//log.Println(status)
 	if role == "super-admin" {
 		// check policy permission
 		if status {
-			// if so create the user
+			// if so create the admin user
 			//hashedPassword, _ := core.HashPassword(user_dto.Password)
 			user_req_model.Id = uuid.NewString()
 			user_req_model.Name = user_dto.FirstName + user_dto.LastName
@@ -99,6 +100,7 @@ func User_signup(c *fiber.Ctx) error {
 			user_req_model.Owner_id = user_id
 			user_req_model.Password = user_dto.Password
 			user_req_model.Email = user_dto.Email
+			user_req_model.Role = "admin"
 			user_req_model.CreateAt = time.Now()
 			user_req_model.UPdatedAt = time.Now()
 			if err := user_req_model.Create_user(); err != nil {
@@ -109,9 +111,17 @@ func User_signup(c *fiber.Ctx) error {
 			if err := pkg.AssignRole(token, user_req_model.Id, "admin"); err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err})
 			}
+			// notify the user via email its user name and password
+			email_notify := new(pkg.EmailAdpater)
+			email_notify.To = user_dto.Email
+			email_notify.Subject = "Hello Admin, here is your default login profile"
+			email_notify.Body = "Your user_name is <<" + user_dto.UserName + ">> and your default password is <<" + user_dto.Password + ">>"
+			if err := email_notify.SendMessageViaEmail(); err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error, unable to notify user credentials": err})
+			}
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "user created successfully"})
 		} else {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error your identitiy is not found": err.Error()})
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error your identitiy is not found": err})
 		}
 	} else if role == "admin" {
 		// check policy permission
@@ -124,6 +134,7 @@ func User_signup(c *fiber.Ctx) error {
 			user_req_model.Owner_id = user_id
 			user_req_model.Password = user_dto.Password
 			user_req_model.Email = user_dto.Email
+			user_req_model.Role = "user"
 			user_req_model.CreateAt = time.Now()
 			user_req_model.UPdatedAt = time.Now()
 			if err := user_req_model.Create_user(); err != nil {
@@ -132,10 +143,18 @@ func User_signup(c *fiber.Ctx) error {
 			if err := pkg.AssignRole(token, user_req_model.Id, "user"); err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err})
 			}
+			// notify the user via email its username and default password
+			email_notify := new(pkg.EmailAdpater)
+			email_notify.To = user_dto.Email
+			email_notify.Subject = "Hello User, here is your default login profile"
+			email_notify.Body = "Your user_name is <<" + user_dto.UserName + ">> and your default password is <<" + user_dto.Password + ">>"
+			if err := email_notify.SendMessageViaEmail(); err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error, unable to notify user credentials": err})
+			}
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "user created successfully"})
 		}
 	}
-	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error your identitiy is not found": err.Error()})
+	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error your identitiy is not found": err})
 
 }
 
@@ -184,6 +203,7 @@ func User_login(c *fiber.Ctx) error {
 	if !core.CheckPasswordHash(userLoginDto.Password, userModel.Password) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Wrong password"})
 	}
+	// check user authorization: 1. check role of the requesting user
 
 	// Generate the token
 	token, err := core.GenerateToken(userModel.Id, userModel.UserName, userModel.Email)
@@ -200,7 +220,7 @@ func User_login(c *fiber.Ctx) error {
 	c.Cookie(cookie)
 
 	// Return success response
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": token})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": token,"role":userModel.Role})
 }
 
 // User_read_by_id godoc
@@ -214,6 +234,7 @@ func User_login(c *fiber.Ctx) error {
 // @Success 200 {object} core.User
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/read/{user_id} [get]
 func User_read_by_id(c *fiber.Ctx) error {
 
@@ -240,6 +261,48 @@ func User_read_by_id(c *fiber.Ctx) error {
 
 }
 
+// User_update_user_name_password godoc
+// @Summary Update user credentials (username and password)
+// @Description Update the username and password of a user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param userCredentialUpdateDto body requests.UserCredentialUpdateDto true "User Credential Update DTO"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 422 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Security BearerAuth
+// @Router /user/update [put]
+func User_update_user_name_password(c *fiber.Ctx) error {
+	user_update_dto := new(requests.UserCredentialUpdateDto)
+	if err := c.BodyParser(user_update_dto); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input", "details": err.Error()})
+	}
+
+	// Validate the login DTO
+	if err := user_update_dto.UpdateUserCredentialDto(); err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"error": "Invalid input", "details": err.Error()})
+	}
+	req_user_id := c.Locals("user_id").(string)
+	req_token := c.Locals("token").(string)
+	user_model := new(core.User)
+	role, _ := pkg.GetUserRole(req_token)
+	status, _ := pkg.VerifyPolicy(req_token, role, "task_app/user_manager_service/api/v0.1/user", "PUT")
+	if status {
+		user_model.Id = req_user_id
+		err := user_model.Update_user_by_id()
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"User update failed": err.Error()})
+		}
+
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "updated successfully!"})
+	}
+	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error": "your identitiy is not found"})
+}
+
 // User_remove_by_id godoc
 // @Summary Remove a user by ID
 // @Description Remove a user from the system by their ID
@@ -252,6 +315,7 @@ func User_read_by_id(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 401 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/remove/{user_id} [delete]
 func User_remove_by_id(c *fiber.Ctx) error {
 	uid := c.Params("user_id")
@@ -287,6 +351,7 @@ func User_remove_by_id(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 401 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/remove_all [delete]
 func User_remove_by_owner_id(c *fiber.Ctx) error {
 	user_model := new(core.User)
@@ -319,6 +384,7 @@ func User_remove_by_owner_id(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/read_all [get]
 func User_list_by_owner_id(c *fiber.Ctx) error {
 	user_model := new(core.User)
@@ -327,15 +393,19 @@ func User_list_by_owner_id(c *fiber.Ctx) error {
 	user_model.Owner_id = req_user_id
 	// authorize the user
 	role, _ := pkg.GetUserRole(req_token)
-	status, _ := pkg.VerifyPolicy(req_token, role, "task_app/task_manager_service/api/v0.1/user", "GET")
+	status, _ := pkg.VerifyPolicy(req_token, role, "task_app/user_manager_service/api/v0.1/user", "GET")
 	if status {
 		if role == "super-admin" || role == "admin" {
 			data, err := user_model.Get_user_by_owner_id()
 			if err != nil {
 				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"User not found": err.Error()})
 			}
-
-			return c.Status(fiber.StatusOK).JSON(data)
+			//log.Println(string(data))
+			users := []core.User{}
+			if err := json.Unmarshal(data, &users); err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"Error": err})
+			}
+			return c.Status(fiber.StatusOK).JSON(users)
 		} else {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"Error": "No policy defined to list for user"})
 		}
@@ -357,6 +427,7 @@ func User_list_by_owner_id(c *fiber.Ctx) error {
 // @Failure 404 {object} map[string]string
 // @Failure 422 {object} map[string]string
 // @Failure 401 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/notify [post]
 func User_notify(c *fiber.Ctx) error {
 	userNotifyDto := new(requests.UserNotifyDto)

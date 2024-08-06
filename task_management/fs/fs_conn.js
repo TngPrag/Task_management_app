@@ -11,9 +11,10 @@ const {
 
 let db;
 let dbName = 'TaskApp';
-
+//mongodb://tele-task-mongodb:27017/TaskApp
+//mongodb://localhost:27017
 async function initializeDB() {
-  const uri = 'mongodb://task-mongodb:27017'; // MongoDB connection string for localhost
+  const uri = 'mongodb://tele-task-mongodb:27017'; // MongoDB connection string for localhost
   db = await connectDB(uri, dbName);
 }
 

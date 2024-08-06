@@ -1,0 +1,120 @@
+
+
+services:
+  tele-nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - tele-task-app-network
+    depends_on:
+      - tele-auth
+      - tele-user-manager
+      - tele-task-manager-service
+      - tele-ui
+
+  tele-auth:
+    build:
+      context: ../Auth
+      dockerfile: docker/Dockerfile
+    ports:
+      - "${AUTH_PORT}:8980"
+    env_file:
+      - .env
+    networks:
+      - tele-task-app-network
+    volumes:
+      - tele-auth-data:/var/lib/auth/data
+    depends_on:
+      - tele-postgres-auth
+
+  tele-user-manager:
+    build:
+      context: ../User_management
+      dockerfile: docker/Dockerfile
+    ports:
+      - "${USER_MANAGER_PORT}:8981"
+    env_file:
+      - .env
+    networks:
+      - tele-task-app-network
+    volumes:
+      - tele-user-manager-data:/var/lib/user_manager/data
+    depends_on:
+      - tele-postgres-user
+
+  tele-task-mongodb:
+    image: mongo:latest
+    container_name: tele-task-mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - tele-task-app-network
+
+  tele-task-manager-service:
+    build:
+      context: ../task_management
+      dockerfile: docker/Dockerfile
+    image: tele-task-manager-service
+    container_name: tele-task-manager-service
+    ports:
+      - "8903:8903"
+    depends_on:
+      - tele-task-mongodb
+    networks:
+      - tele-task-app-network
+    environment:
+      - MONGO_URI=mongodb://tele-task-mongodb:27017/TaskApp
+
+  tele-ui:
+    build:
+      context: ../UI
+      dockerfile: docker/Dockerfile
+    image: tele-ui
+    container_name: tele-ui
+    ports:
+      - "3000:3000"
+    networks:
+      - tele-task-app-network
+
+  tele-postgres-auth:
+    image: postgres:latest
+    container_name: postgres-auth
+    environment:
+      POSTGRES_DB: ${POSTGRES_AUTH_DB}
+      POSTGRES_USER: ${POSTGRES_AUTH_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_AUTH_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - tele-task-app-network
+    volumes:
+      - tele-postgres-auth-data:/var/lib/postgresql/data
+
+  tele-postgres-user:
+    image: postgres:latest
+    container_name: postgres-user
+    environment:
+      POSTGRES_DB: ${POSTGRES_USER_DB}
+      POSTGRES_USER: ${POSTGRES_USER_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_USER_PASSWORD}
+    ports:
+      - "5433:5432"
+    networks:
+      - tele-task-app-network
+    volumes:
+      - tele-postgres-user-data:/var/lib/postgresql/data
+
+networks:
+  tele-task-app-network:
+    driver: bridge
+
+volumes:
+  tele-auth-data:
+  tele-user-manager-data:
+  tele-task-manager-data:
+  tele-postgres-auth-data:
+  tele-postgres-user-data:

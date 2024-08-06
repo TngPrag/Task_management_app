@@ -143,6 +143,40 @@ paths:
       summary: List all policies
       tags:
       - Policy
+  /policy/read/{sub}:
+    get:
+      consumes:
+      - application/json
+      description: Get RBAC policy by subject
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Subject
+        in: path
+        name: sub
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.Policy'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get policy by subject
+      tags:
+      - Policy
   /policy/remove:
     delete:
       consumes:
@@ -275,38 +309,4 @@ paths:
       summary: Create a new role
       tags:
       - Role
-  /task_app/authz_service/api/v0.1/policy/read/{sub}:
-    get:
-      consumes:
-      - application/json
-      description: Get RBAC policy by subject
-      parameters:
-      - description: Bearer Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Subject
-        in: path
-        name: sub
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/core.Policy'
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get policy by subject
-      tags:
-      - Policy
 swagger: "2.0"

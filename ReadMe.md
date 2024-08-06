@@ -2,10 +2,11 @@ Task app services
 ================
 1. Authz service
     -language: Go
-    -webframework: fiber
+    -webframe-work: fiber
     -database: postgresql
 
  * To start the server
+   install dependencies: go mod tidy
    cmd:    go run main.go
  * To monitor the server
    http://localhost:8980/task_app/authz_service/api/v0.1/health
