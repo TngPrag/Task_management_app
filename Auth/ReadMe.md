@@ -19,7 +19,7 @@ Key features
 -------------
    -> Enables super admin to create policy on how users or admins uses the app and specifically each api endpoints.
    -> Enables admins or superadmins to define roles to users or admins respectively.
-   -> SO generally its used as a single source of truth for how and who should use the resources of the app.
+   -> So generally its used as a single source of truth for how and who should use the resources of the app.
 API specification
 -----------------
 1. Identity: super-admin  Method: POST  url_route: '/task_app/authz_service/api/v0.1/policy/write'

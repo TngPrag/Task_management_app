@@ -16,8 +16,7 @@ task: is a logical entity which contains a user who implements the task and
 
 Key functionalities
    * Enables Admin to perform CRUD operations on Task object
-   * Enables Admin to assign task to its users, then eventually users could
-     be notified about the task assignment to their email.
+   * Enables Admin to assign task to its users, then eventually users could be notified about the task assignment to their email.
    * Enables users to view their tasks and update the status of the tasks.
    * It also enables Admin to visualize task status on a dashboard like
         - number of tasks pending
