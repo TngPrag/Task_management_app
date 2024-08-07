@@ -18,9 +18,9 @@ func Fs_open() {
 	config := map[string]string{
 		"user_name": "postgres", 
 		"db_password": "postgres", 
-		"db_host":     "tele-postgres-user",
-		"db_port":     "5432",
-		"db_name":     "user_db"}
+		"db_host": "localhost", 
+		"db_port": "5432", 
+		"db_name": "task_app"}
 	Destro.Fs_driver_open(config)
 
 }
