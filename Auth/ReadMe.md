@@ -1,89 +1,155 @@
--> Init postgresql database
--> Init authorization policies for super-admin, admin and user
-
-Authorization service
+Authorization Service
 ======================
-Domain Entities
------------------
- Policy {
+
+### Init PostgreSQL Database
+- Initialize the PostgreSQL database.
+- Set up authorization policies for super-admin, admin, and user.
+
+### Domain Entities
+#### Policy
+```
+Policy {
     sub:     string
     Object:  string
     Action:  string
- }
- Role  {
-    use_id:     string
+}
+```
+#### Role
+```
+Role  {
+    user_id:     string
     role:       string
- }
+}
+```
 
-Key features
--------------
-   -> Enables super admin to create policy on how users or admins uses the app and specifically each api endpoints.
-   -> Enables admins or superadmins to define roles to users or admins respectively.
-   -> So generally its used as a single source of truth for how and who should use the resources of the app.
-API specification
------------------
-1. Identity: super-admin  Method: POST  url_route: '/task_app/authz_service/api/v0.1/policy/write'
-   Description: Enables super-admin to define a policy for admin and user.
-   Header: {
-          'content-type': application/json
-          'Authoriation': Bearer TOken
-   } 
-   req body {
-        sub       string
-        Object    string
-        Action    string
-   }
-   resp {
-       status 200: "Policy successfully created"
-   }
-2. Identity: super-admin  Method: GET  url_route: '/task_app/authz_service/api/v0.1/policy/read:sub'
-    Description: Enables super-admin to read policies defined to specific subject
-    Header: {
-             'content-type': application/json
-             'Authorization': Bearer Token
-    }
-    req param: sub
-    resp {
-        {list of policies for subject}
-    }
-3. Identity: super-admin Method: DELETE   url_route: '/task_app/authz_service/api/v0.1/policy/remove'
-       Header: {
-             'content-type': application/json
-             'Authorization': Bearer Token
-       }
-       req_body {
-            subject     string
-            Object      string
-            Action      string
-       }
-       resp {
-            status: policy removed succeffully
-       }
-4. Identity: super-admin/admin/user  Method: GET   url_route: '/task_app/authz_service/api/v0.1/policy/check_permission'
-           Header: {
-             'content-type': application/json
-             'Authorization': Bearer Token
-       }
-            req_body {
-                subject     string
-                Object      string
-                Action      string
-            }
-            resp {
-                True|False
-            }
-5. Identity: super-admin   Method: GET url_route: '/task_app/authz_service/api/v0.1/policy'
-       DEscription: Enabes super-admin to list all policies
-       Header: {
-             'content-type': application/json
-             'Authorization': Bearer Token
-       }
-       resp {
-          {list of policies}
-       }
+### Key Features
+- Enables super-admin to create policies that define how users and admins use the app, including access to specific API endpoints.
+- Allows super-admins and admins to define roles for users and other admins.
+- Serves as a single source of truth for determining who can access which resources.
 
-Policy and authorication Definition
------------------------------------
+### API Specification
+
+#### 1. Create Policy
+**Identity:** super-admin  
+**Method:** POST  
+**URL Route:** `/task_app/authz_service/api/v0.1/policy/write`  
+**Description:** Enables super-admin to define a policy for admin and user.  
+**Header:**
+```
+{
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer Token'
+}
+```
+**Request Body:**
+```
+{
+    "sub": "string",
+    "Object": "string",
+    "Action": "string"
+}
+```
+**Response:**
+```
+{
+    "status": 200,
+    "message": "Policy successfully created"
+}
+```
+
+#### 2. Read Policy
+**Identity:** super-admin  
+**Method:** GET  
+**URL Route:** `/task_app/authz_service/api/v0.1/policy/read/:sub`  
+**Description:** Enables super-admin to read policies assigned to a specific subject.  
+**Header:**
+```
+{
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer Token'
+}
+```
+**Request Parameter:** `sub`  
+**Response:**
+```
+{
+    "policies": [ {list of policies for the subject} ]
+}
+```
+
+#### 3. Remove Policy
+**Identity:** super-admin  
+**Method:** DELETE  
+**URL Route:** `/task_app/authz_service/api/v0.1/policy/remove`  
+**Header:**
+```
+{
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer Token'
+}
+```
+**Request Body:**
+```
+{
+    "subject": "string",
+    "Object": "string",
+    "Action": "string"
+}
+```
+**Response:**
+```
+{
+    "status": "Policy removed successfully"
+}
+```
+
+#### 4. Check Permission
+**Identity:** super-admin/admin/user  
+**Method:** GET  
+**URL Route:** `/task_app/authz_service/api/v0.1/policy/check_permission`  
+**Header:**
+```
+{
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer Token'
+}
+```
+**Request Body:**
+```
+{
+    "subject": "string",
+    "Object": "string",
+    "Action": "string"
+}
+```
+**Response:**
+```
+{
+    "permission": true | false
+}
+```
+
+#### 5. List All Policies
+**Identity:** super-admin  
+**Method:** GET  
+**URL Route:** `/task_app/authz_service/api/v0.1/policy`  
+**Description:** Enables super-admin to list all policies.  
+**Header:**
+```
+{
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer Token'
+}
+```
+**Response:**
+```
+{
+    "policies": [ {list of policies} ]
+}
+```
+
+### Policy and Authorization Definitions
+```
 super-admin, task_app/authz_service/api/v0.1/policy, POST
 super-admin, task_app/authz_service/api/v0.1/policy, GET
 super-admin, task_app/authz_service/api/v0.1/policy, DELETE
@@ -95,4 +161,5 @@ super-admin, task_app/authz_service/api/v0.1/role, GET
 admin, task_app/authz_service/api/v0.1/role, POST
 admin, task_app/authz_service/api/v0.1/role, GET
 user, task_app/authz_service/api/v0.1/role, GET
+```
 
