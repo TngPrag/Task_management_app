@@ -1,131 +1,233 @@
-Task Manager Service 
-====================
-domain entity
-------------
-task: is a logical entity which contains a user who implements the task and 
-      the one who owns the task which is the admin, but it also have 
-      status, Deadline, title and description
-    Task {
-            Id           string,
-            Title        string,
-            Description  string,
-            Status       string,
-            Deadline     string,
-            
-         }
+# Task Manager Service
 
-Key functionalities
-   * Enables Admin to perform CRUD operations on Task object
-   * Enables Admin to assign task to its users, then eventually users could be notified about the task assignment to their email.
-   * Enables users to view their tasks and update the status of the tasks.
-   * It also enables Admin to visualize task status on a dashboard like
-        - number of tasks pending
-        - number of tasks In-progress
-        - number of tasks completed
-  
-  API specifications
-  ===================
-  1. Identity-> Admin:  Method->POST  URL_route: '/task_app/task_manager_service/api/v0.1/task/write' 
-           Header: {
-                      'control-type':application/json
-                      'Authoriation':Bearer Token
-                   }
-           req Body {
-                        Title         string,
-                        Description   string,
-                        status        string,
-                        Deadline      string,
-                    } 
-          resp {
-                 status: task created successfully!
-               }
-  2. Identity -> Admin/User: Method->GET   URL_route: '/task_app/task_manager_service/api/v0.1/task/read/:id'
-           Header: {
-                      'control-type':application/json
-                      'Authorization':Bearer Token
-                   } 
-          resp {
-                  Id            string,
-                  Title         string,
-                  Description   string,
-                  status        string,
-                  Deadline      string,
-               }            
-  3. Identity -> Admin: Method: PUT    URL_route: '/task_app/task_manager_service/api/v0.1/task/update_status/:id'
+## Domain Entity
 
-            Header: {
-                      'control-type':application/json
-                      'Authorization': Bearer Token
-                    }
-            req {
-                    status: "Pending/In-progress/completed"            
-        
-                 }
-            resp {
-                   UpdatedTask
-                 }
-  4. Identity -> Admin: Method: PUT   url_route: '/task_app/task_manager_service/api/v0.1/task/update_schedule/:id'
-            Header: {
-                     'control-type':application/json
-                     'Authorization': Bearer Token
-                   }
-            req {
-                 schedule: "Pending/In-progress/compelted"
-            } 
-            resp {
-                  UpdatedTask
-            }
-  5. Identity -> Admin: Method: DELETE url_route: '/task_app/task_manager_service/api/v0.1/task/remove/:id'
-      Description: Enables an admin to remove a task identified by task_id 
-            Header: {
-                    'control-type': application/json
-                    'Authorization': Bearer Token
-            }
-            resp {
-              status: "a task identitifed by {task_id} removed successfully"
-            }
-  6. Identity -> Admin:  Method: DELETE url_route: '/task_app/task_manager_service/api/v0.1/tasks/remove_by_user'
-     Description: Enables an admin to remove all of its tasks assigned to specific user  identified as user_id.
-             Header: {
-                    'control-type': application/json
-                    'Authorization': Bearer Token
-            }
-            resp {
-              status: "all  tasks assigned to a user identified by {task_id} removed successfully"
-            }
-  7. Identity -> Admin: Method: DELETE url_route: '/task_app/task_manager_service/api/v0.1/tasks/remove_by_owner'
-      Description: Enables an admin to remove all its task he/she created
-            Header: {
-                  'control-type': application/json
-                  'Authorization': Bearer Token
-            }
-            resp {
-                  status: "all tasks created by admin are removed successfully"
-            }
-  8. Identity -> Admin: Method: GET url_route: '/task_app/task_manager_service/api/v0.1/tasks/list_by_admin'
-     Description: Enables an admin to list all of its tasks he/she owned/created.
-         Header: {
-              'control-type': application/json
-              'Authorization': Bearer Token
-         }
-         resp {
-                {list of Task object owned by admin}
-         }
-  9. Identity -> User: Method: GET url_route: '/task_app/task_manager_service/api/v0.1/tasks/list_by_user'
-      Description: Enables a user to read all of its tasks assigned by his/her admin
-             Header: {
-                 'control-type': application/json
-                 'Authorization': Bearer Token
-             }
-             
-             resp {
-                  {list of Task object owned by user}
-             }
-             
-Policy and authorization definition
-------------------------------------
-admin, task_app/task_manager_service/api/v0.1/task, POST
-admin, task_app/task_manager_service/api/v0.1/task, GET
-user,  task_app/task_manager_service/api/v0.1/task, GET
-admin, task_app/task_manager_service/api/v0.1/task, PUT
-admin, task_app/task_manager_service/api/v0.1/task, DELETE
+### Task
+A task is a logical entity that contains the user responsible for implementing the task and the admin who owns the task. It also includes attributes such as status, deadline, title, and description.
+
+#### Task Object Structure:
+```json
+{
+    "Id": "string",
+    "Title": "string",
+    "Description": "string",
+    "Status": "string",
+    "Deadline": "string"
+}
+```
+
+## Key Functionalities
+- Enables Admin to perform CRUD operations on Task objects.
+- Allows Admin to assign tasks to users; users receive email notifications upon task assignment.
+- Enables users to view their tasks and update task statuses.
+- Provides Admin with a dashboard visualization for:
+  - Number of pending tasks
+  - Number of tasks in progress
+  - Number of completed tasks
+
+## API Specifications
+
+### 1. Create a Task (Admin)
+**Method:** `POST`  
+**URL:** `/task_app/task_manager_service/api/v0.1/task/write`  
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Request Body:**
+```json
+{
+    "Title": "string",
+    "Description": "string",
+    "Status": "string",
+    "Deadline": "string"
+}
+```
+**Response:**
+```json
+{
+    "status": "Task created successfully!"
+}
+```
+
+### 2. Read a Task (Admin/User)
+**Method:** `GET`  
+**URL:** `/task_app/task_manager_service/api/v0.1/task/read/:id`  
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Response:**
+```json
+{
+    "Id": "string",
+    "Title": "string",
+    "Description": "string",
+    "Status": "string",
+    "Deadline": "string"
+}
+```
+
+### 3. Update Task Status (Admin)
+**Method:** `PUT`  
+**URL:** `/task_app/task_manager_service/api/v0.1/task/update_status/:id`  
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Request Body:**
+```json
+{
+    "status": "Pending | In-progress | Completed"
+}
+```
+**Response:**
+```json
+{
+    "UpdatedTask": "Task updated successfully"
+}
+```
+
+### 4. Update Task Schedule (Admin)
+**Method:** `PUT`  
+**URL:** `/task_app/task_manager_service/api/v0.1/task/update_schedule/:id`  
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Request Body:**
+```json
+{
+    "schedule": "Pending | In-progress | Completed"
+}
+```
+**Response:**
+```json
+{
+    "UpdatedTask": "Task schedule updated successfully"
+}
+```
+
+### 5. Remove a Task (Admin)
+**Method:** `DELETE`  
+**URL:** `/task_app/task_manager_service/api/v0.1/task/remove/:id`  
+**Description:** Allows an Admin to remove a task identified by `task_id`.
+
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Response:**
+```json
+{
+    "status": "Task identified by {task_id} removed successfully"
+}
+```
+
+### 6. Remove All Tasks Assigned to a User (Admin)
+**Method:** `DELETE`  
+**URL:** `/task_app/task_manager_service/api/v0.1/tasks/remove_by_user`  
+**Description:** Allows an Admin to remove all tasks assigned to a specific user identified by `user_id`.
+
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Response:**
+```json
+{
+    "status": "All tasks assigned to user identified by {user_id} removed successfully"
+}
+```
+
+### 7. Remove All Tasks Created by Admin
+**Method:** `DELETE`  
+**URL:** `/task_app/task_manager_service/api/v0.1/tasks/remove_by_owner`  
+**Description:** Allows an Admin to remove all tasks they created.
+
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Response:**
+```json
+{
+    "status": "All tasks created by admin removed successfully"
+}
+```
+
+### 8. List All Tasks Created by Admin
+**Method:** `GET`  
+**URL:** `/task_app/task_manager_service/api/v0.1/tasks/list_by_admin`  
+**Description:** Allows an Admin to list all tasks they created.
+
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Response:**
+```json
+{
+    "tasks": [
+        { "Id": "string", "Title": "string", "Description": "string", "Status": "string", "Deadline": "string" }
+    ]
+}
+```
+
+### 9. List All Tasks Assigned to a User
+**Method:** `GET`  
+**URL:** `/task_app/task_manager_service/api/v0.1/tasks/list_by_user`  
+**Description:** Allows a user to list all tasks assigned by their Admin.
+
+**Headers:**
+```json
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <Token>"
+}
+```
+**Response:**
+```json
+{
+    "tasks": [
+        { "Id": "string", "Title": "string", "Description": "string", "Status": "string", "Deadline": "string" }
+    ]
+}
+```
+
+## Policy and Authorization Definition
+| Role  | Endpoint | Method |
+|-------|------------------------------------------------------------|--------|
+| Admin | `/task_app/task_manager_service/api/v0.1/task` | `POST` |
+| Admin | `/task_app/task_manager_service/api/v0.1/task` | `GET` |
+| User  | `/task_app/task_manager_service/api/v0.1/task` | `GET` |
+| Admin | `/task_app/task_manager_service/api/v0.1/task` | `PUT` |
+| Admin | `/task_app/task_manager_service/api/v0.1/task` | `DELETE` |
+
+---
+
+
