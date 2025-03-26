@@ -1,116 +1,144 @@
-User management Service
-=======================
-Key functionality
-  -> Enables admin,super-admin and user to login into the app
-  -> Enables an admin/super-admin to signup a user or admin.
-  -> Enables an admin to read a user by user_id
-  -> Enables an admin to remove a user by user_id
-  -> Enables an admin/super-admin to remove all of its users or admins respectively.
-  -> Enables an admin/super-admin to read all of its users or admins. 
-  -> Enables an admin/user/super-admin to be authenticated.
-Domain entity
--------------
+## User Management Service
+
+### Key Functionality
+- Enables admin, super-admin, and user to log in to the app.
+- Enables an admin/super-admin to sign up a user or admin.
+- Enables an admin to read a user by `user_id`.
+- Enables an admin to remove a user by `user_id`.
+- Enables an admin/super-admin to remove all of their users or admins, respectively.
+- Enables an admin/super-admin to read all of their users or admins.
+- Enables an admin/user/super-admin to be authenticated.
+
+### Domain Entity
+```go
 User {
-       Owner_id     string
-       Name         string
-       UserName     string
-       Password     string
-       Email        string
-       CreatedAt    time.Time 
-       UpdatedAt    time.Time
+   Owner_id     string
+   Name         string
+   UserName     string
+   Password     string
+   Email        string
+   CreatedAt    time.Time 
+   UpdatedAt    time.Time
+}
+```
+
+### API Specifications
+
+1. **User Authentication Verification**  
+   - **Method:** GET  
+   - **URL:** `/task_app/user_manager_service/api/v0.1/user/verify`
+   - **Description:** Enables authentication/verification for all users.  
+   - **Headers:**  
+     ```json
+     {
+       "Content-Type": "application/json",
+       "Authorization": "Bearer Token"
      }
-API specs
----------
-1. Identity->User/admin/super-admin: Method:GET url_route: '/task_app/user_manager_service/api/v0.1/user/verify'
-   Description: Enables an authentication api/verification to all users
-   Header: {
-              'control-type':application/json
-              'Authorization':Bearer Token
-            }
-   req body {}
-   resp {
-          (user_profile)
-        }
-2. Identity ->User/admin/super-admin: Method:GET url_route: '/task_app/user_manager_service/api/v0.1/user/login'
-      Description: Enables user to login to the app
-      Header: {
-                'control-type':application/json
-                'Authorization':Bearer Token
-              }
-3. Identity -> admin/super-admin: Method: POST url_route: '/task_app/user_manager_service/api/v0.1/user/signup'
-      Description: Enables admin/super-admin to register users or admins respectively.
-       Header: {
-                 'control-type':application/json
-                 'Authorization':Bearer Token
-               }
-4. Identity -> super-admin/admin: Method: GET url_route: '/task_app/user_manager_service/api/v0.1/user'
-      Description: Enables an admin or super user to retrieve one user or admin using user_id.
-      Header: {
-                'control-type':application/json
-         	'Authorization':Bearer Token
-              }
-      req_param: user_id
-      resp {
-             {user}
-           }
-5. Identity -> super-admin/admin: Method: DELETE url_route: '/task_app/user_manager_service/api/v0.1/user'
-    Descritpion: Enables an admin or super-admin to remove a user or an admin using user_id
-     Header: {
-              'control-type':application/json
-              'Authorization':Bearer TOken
-             }
-     req_para: user_id
-     resp {
-            (user_id)
-          }
-6. Identity -> super-admin/admin: Method:DELETE url_route: '/task_app/user_manager_service/api/v0.1/user'
-    Description: Enables to remove all users or admins by admin or super-admin respectively.
-    Header: {
-               'Control-type':application/json
-               'Authorization':Bearer TOken
-            } 
-    req_param: user_id
-    resp {
-          {list of users}
-         }
-7. Identity -> admin: Method: POST url_route: '/task_app/user_manager_service/api/v0.1/user/notify'
-     Description: Enables admins to notify the user when the user is assigned a task.
-     Header: {
+     ```
+   - **Request Body:** `{}`
+   - **Response:** `{ user_profile }`
 
-            'control-type': application/json
-            'Authorization': Bearer Token
-     } 
-     req Body {
-           "email" : string,
-           "title" : string,
-           "description": string,
-           "deadline": string,
+2. **User Login**  
+   - **Method:** GET  
+   - **URL:** `/task_app/user_manager_service/api/v0.1/user/login`
+   - **Description:** Enables users to log in to the app.
+   - **Headers:**  
+     ```json
+     {
+       "Content-Type": "application/json",
+       "Authorization": "Bearer Token"
      }
-     resp {
-      status: 200
-         "user has been notified successfully about the task assignment"
+     ```
+
+3. **User/Admin Signup**  
+   - **Method:** POST  
+   - **URL:** `/task_app/user_manager_service/api/v0.1/user/signup`
+   - **Description:** Enables an admin/super-admin to register users or admins.
+   - **Headers:**  
+     ```json
+     {
+       "Content-Type": "application/json",
+       "Authorization": "Bearer Token"
      }
+     ```
 
-Policy and authorization definition
---------/---------------------------
-admin,task_app/user_manager_service/api/v0.1/user, POST
-super-admin,task_app/user_manager_service/api/v0.1/user,POST 
+4. **Retrieve User by ID**  
+   - **Method:** GET  
+   - **URL:** `/task_app/user_manager_service/api/v0.1/user`
+   - **Description:** Enables an admin or super-admin to retrieve one user or admin using `user_id`.
+   - **Headers:**  
+     ```json
+     {
+       "Content-Type": "application/json",
+       "Authorization": "Bearer Token"
+     }
+     ```
+   - **Request Parameter:** `user_id`
+   - **Response:** `{ user }`
 
-admin/user/super-admin,task_app/user_manager_service/api/v0.1/user,GET
+5. **Remove User by ID**  
+   - **Method:** DELETE  
+   - **URL:** `/task_app/user_manager_service/api/v0.1/user`
+   - **Description:** Enables an admin or super-admin to remove a user or admin using `user_id`.
+   - **Headers:**  
+     ```json
+     {
+       "Content-Type": "application/json",
+       "Authorization": "Bearer Token"
+     }
+     ```
+   - **Request Parameter:** `user_id`
+   - **Response:** `{ user_id }`
 
+6. **Remove All Users/Admins**  
+   - **Method:** DELETE  
+   - **URL:** `/task_app/user_manager_service/api/v0.1/user`
+   - **Description:** Enables an admin or super-admin to remove all users or admins under their management.
+   - **Headers:**  
+     ```json
+     {
+       "Content-Type": "application/json",
+       "Authorization": "Bearer Token"
+     }
+     ```
+   - **Request Parameter:** `user_id`
+   - **Response:** `{ list_of_users }`
 
+7. **Notify User of Task Assignment**  
+   - **Method:** POST  
+   - **URL:** `/task_app/user_manager_service/api/v0.1/user/notify`
+   - **Description:** Enables admins to notify users when they are assigned a task.
+   - **Headers:**  
+     ```json
+     {
+       "Content-Type": "application/json",
+       "Authorization": "Bearer Token"
+     }
+     ```
+   - **Request Body:**  
+     ```json
+     {
+       "email": "string",
+       "title": "string",
+       "description": "string",
+       "deadline": "string"
+     }
+     ```
+   - **Response:**  
+     ```json
+     {
+       "status": 200,
+       "message": "User has been notified successfully about the task assignment"
+     }
+     ```
 
-super-admin,task_app/user_manager_service/api/v0.1/user, GET
+### Policy and Authorization Definitions
 
-admin,task_app/user_manager_service/api/v0.1/user,DELETE
-
-super-admin,task_app/user_manager_service/api/v0.1/user,DELETE
-
-
-
-
-
-
-
- 
-
+| Role          | Endpoint                                          | Method |
+|--------------|--------------------------------------------------|--------|
+| admin        | `/task_app/user_manager_service/api/v0.1/user`   | POST   |
+| super-admin  | `/task_app/user_manager_service/api/v0.1/user`   | POST   |
+| admin/user/super-admin | `/task_app/user_manager_service/api/v0.1/user` | GET   |
+| super-admin  | `/task_app/user_manager_service/api/v0.1/user`   | GET    |
+| admin        | `/task_app/user_manager_service/api/v0.1/user`   | DELETE |
+| super-admin  | `/task_app/user_manager_service/api/v0.1/user`   | DELETE |
